@@ -98,7 +98,6 @@ def loadCsv(inputfilename, servername, user, password, dbname, metric,
                 fields[f] = v
 
             point = {"measurement": metric, "time": timestamp, "fields": fields, "tags": tags}
-
             datapoints.append(point)
 
             count+=1
@@ -112,21 +111,21 @@ def loadCsv(inputfilename, servername, user, password, dbname, metric,
                     print('Problem inserting points, exiting...')
                     exit(1)
 
-                print("Wrote %d points, up to %s, response: %s" % (len(datapoints), response))
+                print("Wrote %d points, response: %s" % (len(datapoints), response))
 
                 datapoints = []
             
     # write rest
-    if len(datapoints) > 0:
-        print('Read %d lines'%count)
-        print('Inserting %d datapoints...'%(len(datapoints)))
-        # response = client.write_points(datapoints)
+    # if len(datapoints) > 0:
+    #     print('Read %d lines'%count)
+    #     print('Inserting %d datapoints...'%(len(datapoints)))
+    #     response = client.write_points(datapoints)
 
-        if response == False:
-            print('Problem inserting points, exiting...')
-            exit(1)
+    #     if response == False:
+    #         print('Problem inserting points, exiting...')
+    #         exit(1)
 
-        print("Wrote %d, response: %s" % (len(datapoints), response))
+    #     print("Wrote %d, response: %s" % (len(datapoints), response))
 
     print('Done')
 
@@ -193,4 +192,4 @@ if __name__ == "__main__":
     #     'Asia/Shanghai', False)
         
     #cli test
-    #python csv_to_influxdb.py --input /Users/thomas/Downloads/dataset_1_20200311/in1.csv --dbname test --m m1 --fieldcolumns voltage,current
+    #python csv_to_influxdb.py --input /Users/thomas/Downloads/dataset_1_20200311/in1.csv --dbname test --m m1 --fieldcolumns voltage,current --tagcolumns tag
