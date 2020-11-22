@@ -191,3 +191,6 @@ if __name__ == "__main__":
     #     'm1', 'timestamp', '%Y-%m-%d %H:%M:%S', 'tag', 
     #     'voltage,current', False, ',', 1000, False, 
     #     'Asia/Shanghai', False)
+        
+    #cli test
+    #python csv_to_influxdb.py --input /Users/thomas/Downloads/dataset_1_20200311/in1.csv --dbname test --m m1 --fieldcolumns voltage,current
