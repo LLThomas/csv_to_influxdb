@@ -80,8 +80,8 @@ def loadCsv(inputfilename, servername, user, password, dbname, metric,
             tags = {}
             for t in tagcolumns:
                 v = 0
-                if t in row:
-                    v = row[t]
+                #if t in row:
+                #   v = row[t]
                 tags[t] = v
 
             # keep fields
