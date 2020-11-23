@@ -192,4 +192,7 @@ if __name__ == "__main__":
     #     'Asia/Shanghai', False)
         
     #cli test
-    #python csv_to_influxdb.py --input /Users/thomas/Downloads/dataset_1_20200311/in1.csv --dbname test --m m1 --fieldcolumns voltage,current --tagcolumns tag
+    #Mac
+    #python csv_to_influxdb.py --input /Users/thomas/Downloads/dataset_1_20200311/in1.csv --dbname debs2020 --m vol_cur --fieldcolumns voltage,current --tagcolumns tag
+    #Win
+    #python csv_to_influxdb.py --input E:\download\dataset_1\dataset_1_20200311\in1.csv --dbname debs2020 --m vol_cur --fieldcolumns voltage,current --tagcolumns tag
