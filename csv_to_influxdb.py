@@ -6,6 +6,11 @@ import datetime
 from pytz import timezone
 from influxdb import InfluxDBClient
 
+epoch_naive = datetime.datetime.utcfromtimestamp(0)
+epoch = timezone('UTC').localize(epoch_naive)
+def unix_time_millis(dt):
+    return int((dt - epoch).total_seconds() * 1000)
+
 ##
 ## Check if data type of field is float
 ##
@@ -73,15 +78,27 @@ def loadCsv(inputfilename, servername, user, password, dbname, metric,
         reader = csv.DictReader(csvfile, delimiter=delimiter)
         for row in reader:
             
+            ready_process_time = (time_cur+datetime.timedelta(seconds=count/1000)).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+            datetime_naive = datetime.datetime.strptime(ready_process_time,timeformat)
+
+            if datetime_naive.tzinfo is None:
+                datetime_local = timezone(datatimezone).localize(datetime_naive)
+            else:
+                datetime_local = datetime_naive
+
+            timestamp = unix_time_millis(datetime_local)
+
             # Retention to milliseconds
-            timestamp = (time_cur+datetime.timedelta(seconds=count/1000)).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+            # ready_process_time = (time_cur+datetime.timedelta(seconds=count/1000)).strftime('%Y%m%d%H%M%S.%f')[:-3]
+            # timestamp = datetime.datetime.strptime
+            # timestamp = (time_cur+datetime.timedelta(seconds=count/1000)).strftime('%m%d%H%M%S.%f')[:-3]
 
             # keep tags
             tags = {}
             for t in tagcolumns:
                 v = 0
                 if t in row:
-                  v = row[t]
+                    v = row[t]
                 tags[t] = v
 
             # keep fields
@@ -98,11 +115,15 @@ def loadCsv(inputfilename, servername, user, password, dbname, metric,
                 fields[f] = v
 
             point = {"measurement": metric, "time": timestamp, "fields": fields, "tags": tags}
+            print(point)
             datapoints.append(point)
 
             count+=1
             
             if len(datapoints) % batchsize == 0:
+
+                
+
                 print('Read %d lines'%count)
                 print('Inserting %d datapoints...'%(len(datapoints)))
                 response = client.write_points(datapoints)
@@ -114,6 +135,8 @@ def loadCsv(inputfilename, servername, user, password, dbname, metric,
                 print("Wrote %d points, response: %s" % (len(datapoints), response))
 
                 datapoints = []
+
+                break
             
     # write rest
     # if len(datapoints) > 0:
@@ -162,8 +185,8 @@ if __name__ == "__main__":
     parser.add_argument('-tc', '--timecolumn', nargs='?', default='timestamp',
                         help='Timestamp column name. Default: timestamp.')
 
-    parser.add_argument('-tf', '--timeformat', nargs='?', default='%Y-%m-%d %H:%M:%S',
-                        help='Timestamp format. Default: \'%%Y-%%m-%%d %%H:%%M:%%S\' e.g.: 1970-01-01 00:00:00')
+    parser.add_argument('-tf', '--timeformat', nargs='?', default='%Y-%m-%d %H:%M:%S.%f',
+                        help='Timestamp format. Default: \'%%Y-%%m-%%d %%H:%%M:%%S.%%f\' e.g.: 1970-01-01 00:00:00')
 
     parser.add_argument('-tz', '--timezone', default='Asia/Shanghai',
                         help='Timezone of supplied data. Default: UTC')
@@ -185,6 +208,12 @@ if __name__ == "__main__":
         args.fieldcolumns, args.gzip, args.delimiter, args.batchsize, args.create, 
         args.timezone, args.ssl)
 
+    # local test
+#     loadCsv('E:\download\dataset_1\dataset_1_20200311\in1.csv', 'localhost:8086', 'admin', 'admin', 'debs2020', 
+#         'vol_cur', 'timestamp', '%Y-%m-%d %H:%M:%S.%f', 'tag', 
+#         'voltage,current', False, ',', 1000, False, 
+#         'Asia/Shanghai', False)
+        
     # local test
     # loadCsv('/Users/thomas/Downloads/dataset_1_20200311/in1.csv', 'localhost:8086', 'admin', 'admin', 'test', 
     #     'm1', 'timestamp', '%Y-%m-%d %H:%M:%S', 'tag', 
