@@ -9,7 +9,7 @@ from influxdb import InfluxDBClient
 epoch_naive = datetime.datetime.utcfromtimestamp(0)
 epoch = timezone('UTC').localize(epoch_naive)
 def unix_time_millis(dt):
-    return int((dt - epoch).total_seconds() * 1000000000)
+    return int((dt - epoch).total_seconds())
 
 ##
 ## Check if data type of field is float
@@ -78,7 +78,7 @@ def loadCsv(inputfilename, servername, user, password, dbname, metric,
         reader = csv.DictReader(csvfile, delimiter=delimiter)
         for row in reader:
             
-            ready_process_time = (time_cur+datetime.timedelta(seconds=count/1000)).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+            ready_process_time = (time_cur+datetime.timedelta(seconds=count)).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
             datetime_naive = datetime.datetime.strptime(ready_process_time,timeformat)
 
             if datetime_naive.tzinfo is None:
@@ -86,7 +86,7 @@ def loadCsv(inputfilename, servername, user, password, dbname, metric,
             else:
                 datetime_local = datetime_naive
 
-            timestamp = unix_time_millis(datetime_local)
+            timestamp = unix_time_millis(datetime_local) * 1000000000
 
             # Retention to milliseconds
             # ready_process_time = (time_cur+datetime.timedelta(seconds=count/1000)).strftime('%Y%m%d%H%M%S.%f')[:-3]
