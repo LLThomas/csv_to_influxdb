@@ -1,2 +1,3 @@
-# csv_to_influxdb
-  这个csv_to_influxdb对大神的脚本稍做改动，适合于导入以0，1，2...标签标记的大量数据
+## 两个csv文件写入InfluxDB的小工具：
+1. csv_to_influxdb利用client library
+2. csv_tool用来消除csv文件中的双引号、对时间数据格式做了修改
